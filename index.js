@@ -24,7 +24,7 @@ async function run() {
   const branch = context.ref.replace("refs/heads/", "");
   const url = payload.repository.html_url;
 
-  text += `- [${name}](${payload.sender.html_url}) on [${repo}](${url})/[${branch}](${url}/tree/${branch})`;
+  text += `- [${name}](<${payload.sender.html_url}>) on [${repo}](<${url}>)/[${branch}](<${url}/tree/${branch}>)`;
 
   const msg = new webhook.MessageBuilder()
     .setName(payload.sender.login)
