@@ -9,27 +9,43 @@ async function run() {
   const context = github.context;
   const payload = context.payload;
 
+  const blocks = ["▂", "▄", "▆", "█"];
   let text = "";
 
   for (const commit of payload.commits) {
-    text += `[\`${commit.id.substring(0, 7)}\`](${commit.url}) ${
-      commit.message.includes("!private")
-        ? "\`This commit has been marked as private!\`"
-        : commit.message
-    }\n`;
+    text += `[\`${commit.id.substring(0, 7)}\`](<${commit.url}>) `;
+
+    let message = commit.message;
+
+    if (message.includes("!private")) {
+      message = message.replace(" !private", "");
+
+      for (let i = 0; i < message.length; i++) {
+        const code = message.charAt(i);
+
+        if (code.match(/^[\p{L}\p{N}]*$/u)) {
+          text += blocks[(blocks.length * Math.random()) | 0];
+        } else {
+          text += code;
+        }
+      }
+    } else {
+      text += message;
+    }
+    text += "\n";
   }
 
   const sender = payload.sender.login;
   const repo = payload.repository.name;
   const branch = context.ref.replace("refs/heads/", "");
-  const senderUrl = `<${payload.sender.html_url}>`;
-  const repoUrl = `<${payload.repository.html_url}>`;
-  const branchUrl = `<${repoUrl}/tree/${branch}>`;
+  const senderUrl = `${payload.sender.html_url}`;
+  const repoUrl = `${payload.repository.html_url}`;
+  const branchUrl = `${repoUrl}/tree/${branch}`;
 
-  text += `- [${sender}](${senderUrl}) on [${repo}](${repoUrl})/[${branch}](${branchUrl})`;
-  
-  hook.setUsername(payload.sender.login)
-  hook.setAvatar(payload.sender.avatar_url)
+  text += `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
+
+  hook.setUsername(payload.sender.login);
+  hook.setAvatar(payload.sender.avatar_url);
 
   hook.send(text);
 }
