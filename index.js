@@ -1,10 +1,10 @@
 const github = require("@actions/github");
 const core = require("@actions/core");
-const webhook = require("webhook-discord");
+const { Webhook } = require("discord-webhook-node");
 
 async function run() {
   const webhookUrl = core.getInput("webhookUrl").replace("/github", "");
-  const hook = new webhook.Webhook(webhookUrl);
+  const hook = new Webhook(webhookUrl);
 
   const context = github.context;
   const payload = context.payload;
@@ -19,19 +19,19 @@ async function run() {
     }\n`;
   }
 
-  const name = payload.sender.login;
+  const sender = payload.sender.login;
   const repo = payload.repository.name;
   const branch = context.ref.replace("refs/heads/", "");
-  const url = payload.repository.html_url;
+  const senderUrl = `<${payload.sender.html_url}>`;
+  const repoUrl = `<${payload.repository.html_url}>`;
+  const branchUrl = `<${repoUrl}/tree/${branch}>`;
 
-  text += `- [${name}](${payload.sender.url}) on [${repo}](${url})/[${branch}](${url}/tree/${branch})`;
+  text += `- [${sender}](${senderUrl}) on [${repo}](${repoUrl})/[${branch}](${branchUrl})`;
+  
+  hook.setUsername(payload.sender.login)
+  hook.setAvatar(payload.sender.avatar_url)
 
-  const msg = new webhook.MessageBuilder()
-    .setName(payload.sender.login)
-    .setAvatar(payload.sender.avatar_url)
-    .setText(text);
-
-  hook.send(msg);
+  hook.send(text);
 }
 
 run();
