@@ -45,7 +45,6 @@ async function run() {
 
   const sender = payload.sender.login;
   const repo = payload.repository.name;
-  const branch = context.ref.replace("refs/heads/", "");
   const senderUrl = `${payload.sender.html_url}`;
   const repoUrl = `${payload.repository.html_url}`;
   const branchUrl = `${repoUrl}/tree/${branch}`;
