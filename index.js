@@ -4,10 +4,18 @@ const { Webhook } = require("discord-webhook-node");
 
 async function run() {
   const webhookUrl = core.getInput("webhookUrl").replace("/github", "");
-  const hook = new Webhook(webhookUrl);
 
   const context = github.context;
   const payload = context.payload;
+  
+  const branches = core.getMultilineInput("branches");
+  const branch = context.ref.replace("refs/heads/", "");
+  
+  try {
+    if (!branches.includes(branch)) return;
+  } catch (error) {}
+  
+  const hook = new Webhook(webhookUrl);
 
   const blocks = ["▂", "▄", "▆", "█"];
   let text = "";
