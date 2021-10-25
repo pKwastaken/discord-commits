@@ -12,7 +12,7 @@ async function run() {
   const branch = context.ref.replace("refs/heads/", "");
   
   try {
-    if (!branches.includes(branch)) return;
+    if (branches.length != 0 && !branches.includes(branch)) return;
   } catch (error) {}
   
   const hook = new Webhook(webhookUrl);
