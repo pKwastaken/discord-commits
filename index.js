@@ -25,8 +25,8 @@ async function run() {
 
     let message = commit.message;
 
-    if (message.includes("!private")) {
-      message = message.replace(" !private", "");
+    if (message.includes("!")) {
+      message = message.replace("!", "");
 
       for (let i = 0; i < message.length; i++) {
         const code = message.charAt(i);
