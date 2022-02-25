@@ -1,5 +1,5 @@
 # facepunch-style-commits
-- Make a file under `.github/workflows` with this code below
+- Make a `.yml` file under `.github/workflows` with this code below
 ```yml
 name: CI
 on: [push]
