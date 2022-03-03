@@ -15,3 +15,4 @@ jobs:
 ```
 - Add your discord webhook as a secret named `DISCORD_WEBHOOK`
 - Any commits with an exclamation mark will be replaced with random blocks
+![](https://i.imgur.com/XIHivVQ.jpg)
