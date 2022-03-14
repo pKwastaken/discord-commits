@@ -2,6 +2,24 @@ const github = require("@actions/github");
 const core = require("@actions/core");
 const { Webhook } = require("discord-webhook-node");
 
+const blocks = ["▂", "▄", "▆", "█"];
+
+function obfuscate(input) {
+  let output = "";
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charAt(i);
+
+    if (char.match(/\S+/)) {
+      output += blocks[(blocks.length * Math.random()) | 0];
+    } else {
+      output += char;
+    }
+  }
+
+  return output;
+}
+
 async function run() {
   const webhookUrl = core.getInput("webhookUrl").replace("/github", "");
 
@@ -17,8 +35,7 @@ async function run() {
   
   const hook = new Webhook(webhookUrl);
 
-  const blocks = ["▂", "▄", "▆", "█"];
-  let text = "";
+  let isPrivate = false
 
   for (const commit of payload.commits) {
     text += `[\`${commit.id.substring(0, 7)}\`](<${commit.url}>) `;
@@ -27,16 +44,8 @@ async function run() {
 
     if (message.includes("!")) {
       message = message.replace("!", "");
-
-      for (let i = 0; i < message.length; i++) {
-        const code = message.charAt(i);
-
-        if (code.match(/^[\p{L}\p{N}]*$/u)) {
-          text += blocks[(blocks.length * Math.random()) | 0];
-        } else {
-          text += code;
-        }
-      }
+      isPrivate = true;
+      text += obfuscate(message);
     } else {
       text += message;
     }
@@ -49,7 +58,11 @@ async function run() {
   const repoUrl = `${payload.repository.html_url}`;
   const branchUrl = `${repoUrl}/tree/${branch}`;
 
-  text += `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
+  if (isPrivate) {
+    text += `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`;
+  } else {
+    text += `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
+  }
 
   hook.setUsername(payload.sender.login);
   hook.setAvatar(payload.sender.avatar_url);
