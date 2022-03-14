@@ -39,16 +39,17 @@ async function run() {
   let isPrivate = false;
 
   for (const commit of payload.commits) {
-    text += `[\`${commit.id.substring(0, 7)}\`](<${commit.url}>) `;
+    text += `[\`${commit.id.substring(0, 7)}\`]`;
 
     let message = commit.message;
 
     if (message.includes("!")) {
+      text += `() `;
       message = message.replace("!", "");
       isPrivate = true;
       text += obfuscate(message);
     } else {
-      text += message;
+      text += `(<${commit.url}>) ${message}`;
     }
     text += "\n";
   }
