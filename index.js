@@ -35,7 +35,8 @@ async function run() {
   
   const hook = new Webhook(webhookUrl);
 
-  let isPrivate = false
+  let text = "";
+  let isPrivate = false;
 
   for (const commit of payload.commits) {
     text += `[\`${commit.id.substring(0, 7)}\`](<${commit.url}>) `;
