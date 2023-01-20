@@ -1,122 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 4822:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const github_1 = __nccwpck_require__(5438);
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const node_fetch_1 = __importDefault(__nccwpck_require__(467));
-const utils_1 = __nccwpck_require__(918);
-const url = core_1.default.getInput("webhookUrl").replace("/github", "");
-const data = github_1.context.payload;
-const sender = data.sender.login;
-const repo = data.repository.name;
-const branch = github_1.context.ref.replace("refs/heads/", "");
-const senderUrl = `${data.sender.html_url}`;
-const repoUrl = `${data.repository.html_url}`;
-const branchUrl = `${repoUrl}/tree/${branch}`;
-const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
-const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
-function sendWebhook(text) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const response = yield (0, node_fetch_1.default)(url, {
-            method: "POST",
-            body: JSON.stringify({
-                username: data.sender.login,
-                avatar_url: data.sender.avatar_url,
-                content: text
-            }),
-            headers: { "Content-Type": "application/json" }
-        });
-        return response;
-    });
-}
-function buildBuffer(commit) {
-    let buffer = `[\`${commit.id.substring(0, 7)}\`]`;
-    let message = commit.message;
-    let isPrivate = false;
-    if (message.startsWith("!") || message.startsWith("$")) {
-        isPrivate = true;
-        buffer += `() `;
-        message = message.substring(1).trim();
-        buffer += (0, utils_1.obfuscate)(message);
-    }
-    else {
-        buffer += `(<${commit.url}>) ${message}`;
-    }
-    buffer += "\n";
-    return [buffer, isPrivate];
-}
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let workingFooter = footer;
-        let text = "";
-        for (const commit of data.commits) {
-            const [buffer, isPrivate] = buildBuffer(commit);
-            if (isPrivate)
-                workingFooter = privateFooter;
-            if (buffer.length + text.length + workingFooter.length > 2000) {
-                text += workingFooter;
-                const response = yield sendWebhook(text);
-                if (!response.ok) {
-                    core_1.default.setFailed(yield response.text());
-                }
-                workingFooter = footer;
-                text = "";
-            }
-            text += buffer;
-            data.commits.shift();
-        }
-    });
-}
-run();
-
-
-/***/ }),
-
-/***/ 918:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.obfuscate = void 0;
-const blocks = ["▂", "▄", "▆", "█"];
-function obfuscate(input) {
-    let output = "";
-    for (let i = 0; i < input.length; i++) {
-        const char = input.charAt(i);
-        if (char.match(/\S+/)) {
-            const rand = Math.random() * blocks.length;
-            output += blocks[Math.trunc(rand)];
-        }
-        else {
-            output += char;
-        }
-    }
-    return output;
-}
-exports.obfuscate = obfuscate;
-
-
-/***/ }),
-
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -9711,6 +9595,122 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 6144:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const github_1 = __nccwpck_require__(5438);
+const core_1 = __importDefault(__nccwpck_require__(2186));
+const node_fetch_1 = __importDefault(__nccwpck_require__(467));
+const utils_1 = __nccwpck_require__(1314);
+const url = core_1.default.getInput("webhookUrl").replace("/github", "");
+const data = github_1.context.payload;
+const sender = data.sender.login;
+const repo = data.repository.name;
+const branch = github_1.context.ref.replace("refs/heads/", "");
+const senderUrl = `${data.sender.html_url}`;
+const repoUrl = `${data.repository.html_url}`;
+const branchUrl = `${repoUrl}/tree/${branch}`;
+const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
+const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
+function sendWebhook(text) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield (0, node_fetch_1.default)(url, {
+            method: "POST",
+            body: JSON.stringify({
+                username: data.sender.login,
+                avatar_url: data.sender.avatar_url,
+                content: text
+            }),
+            headers: { "Content-Type": "application/json" }
+        });
+        return response;
+    });
+}
+function buildBuffer(commit) {
+    let buffer = `[\`${commit.id.substring(0, 7)}\`]`;
+    let message = commit.message;
+    let isPrivate = false;
+    if (message.startsWith("!") || message.startsWith("$")) {
+        isPrivate = true;
+        buffer += `() `;
+        message = message.substring(1).trim();
+        buffer += (0, utils_1.obfuscate)(message);
+    }
+    else {
+        buffer += `(<${commit.url}>) ${message}`;
+    }
+    buffer += "\n";
+    return [buffer, isPrivate];
+}
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let workingFooter = footer;
+        let text = "";
+        for (const commit of data.commits) {
+            const [buffer, isPrivate] = buildBuffer(commit);
+            if (isPrivate)
+                workingFooter = privateFooter;
+            if (buffer.length + text.length + workingFooter.length > 2000) {
+                text += workingFooter;
+                const response = yield sendWebhook(text);
+                if (!response.ok) {
+                    core_1.default.setFailed(yield response.text());
+                }
+                workingFooter = footer;
+                text = "";
+            }
+            text += buffer;
+            data.commits.shift();
+        }
+    });
+}
+run();
+
+
+/***/ }),
+
+/***/ 1314:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.obfuscate = void 0;
+const blocks = ["▂", "▄", "▆", "█"];
+function obfuscate(input) {
+    let output = "";
+    for (let i = 0; i < input.length; i++) {
+        const char = input.charAt(i);
+        if (char.match(/\S+/)) {
+            const rand = Math.random() * blocks.length;
+            output += blocks[Math.trunc(rand)];
+        }
+        else {
+            output += char;
+        }
+    }
+    return output;
+}
+exports.obfuscate = obfuscate;
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -9889,7 +9889,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
