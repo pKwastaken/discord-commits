@@ -3,6 +3,7 @@ const core = require("@actions/core");
 const { Webhook } = require("discord-webhook-node");
 
 const blocks = ["▂", "▄", "▆", "█"];
+const test = "https://discord.com/api/webhooks/902016864404791346/8mWySdSODdthXCLYnug0w1GCAK10Z7WESmDzP4GeQwwokmZ8PmyEmOWeSAG5dwu1uQWY"
 
 function obfuscate(input) {
   let output = "";

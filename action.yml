@@ -1,17 +1,14 @@
-name: Facepunch Style Commits
-author: wildflowericecoffee
+name: Discord Commits
+author: itz-coffee
 description: >
-  Send notifications to Discord using a webhook.
+  Send commits to Discord using a webhook.
 inputs:
   webhookUrl:
     description: Discord webhook URL. Should be stored in a secret and inserted as a context expression.
     required: true
-  branches:
-    description: A multiline string of allowed branches to run.
-    required: false
 runs:
-  using: 'node12'
-  main: 'index.js'
+  using: "node16"
+  main: "dist/index.js"
 branding:
   color: orange
   icon: alert-triangle
