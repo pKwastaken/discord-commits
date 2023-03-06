@@ -38,7 +38,8 @@ async function sendWebhook(text: string): Promise<Response> {
 }
 
 function buildBuffer(commit: Commit): [string, boolean] {
-	let buffer = `[\`${commit.id.substring(0, 7)}\`]`
+	const id = commit.id.substring(0, 8)
+	let buffer = `[\`${id}\`]`
 	let message = commit.message
 	let isPrivate = false
 
@@ -48,7 +49,7 @@ function buildBuffer(commit: Commit): [string, boolean] {
 		message = message.substring(1).trim()
 		buffer += obfuscate(message)
 	} else {
-		buffer += `(<${commit.url}>) ${message}`
+		buffer += `(<${repoUrl}/commit/${id}>) ${message}`
 	}
 
 	buffer += "\n"
