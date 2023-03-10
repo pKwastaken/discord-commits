@@ -22,6 +22,7 @@ export function obfuscate(input: string): string {
 export function generateText(commit: Commit): [string, boolean] {
 	const id = commit.id.substring(0, 8)
 	const repo = commit.url.split("/commit")[0]
+
 	let text = `[\`${id}\`]`
 	let message = commit.message
 	let isPrivate = false

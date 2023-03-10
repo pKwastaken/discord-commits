@@ -27,7 +27,6 @@ let buffer = new String()
 
 async function send(): Promise<void> {
 	const content = buffer + footer()
-	console.log("send length:" + content.length)
 	const res = await fetch(url, {
 		method: "POST",
 		body: JSON.stringify({
@@ -38,9 +37,7 @@ async function send(): Promise<void> {
 		headers: { "Content-Type": "application/json" }
 	})
 
-	if (!res.ok) {
-		core.setFailed(await res.text())
-	}
+	if (!res.ok) core.setFailed(await res.text())
 
 	buffer = new String()
 }
@@ -48,31 +45,19 @@ async function send(): Promise<void> {
 async function run(): Promise<void> {
 	if (context.eventName !== "push") return
 
-	let hasSent = false
-	console.log(data.commits)
 	for (const commit of data.commits) {
-		hasSent = false
 		let [text, _private] = generateText(commit)
-		if (_private) isPrivate = true
-		console.log("text: " + text.length)
-		console.log("in loop buffer: " + buffer.length)
-		console.log(
-			"length: " + Number(buffer.length + footer().length + text.length)
-		)
 
-		if (buffer.length + footer().length + text.length >= 2000) {
-			await send()
-			hasSent = true
-		}
+		if (_private) isPrivate = true
+
+		const sendLength = text.length + buffer.length + footer().length
+
+		if (sendLength >= 2000) await send()
 
 		buffer += text
 	}
 
-	console.log("out loop buffer: " + buffer.length)
-
-	if (!hasSent) {
-		await send()
-	}
+	if (buffer.length > 0) await send()
 }
 
 run()
