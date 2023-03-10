@@ -13,8 +13,12 @@ const senderUrl = `${data.sender!.html_url}`
 const repoUrl = `${data.repository!.html_url}`
 const branchUrl = `${repoUrl}/tree/${branch}`
 
+console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl)
+
 const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`
+
+console.log(footer, privateFooter)
 
 type Commit = {
 	id: string
@@ -56,7 +60,6 @@ function buildBuffer(commit: Commit): [string, boolean] {
 	}
 
 	buffer += "\n"
-console.log(commit)
 	return [buffer, isPrivate]
 }
 

@@ -13907,8 +13907,10 @@ const branch = github_1.context.ref.replace("refs/heads/", "");
 const senderUrl = `${data.sender.html_url}`;
 const repoUrl = `${data.repository.html_url}`;
 const branchUrl = `${repoUrl}/tree/${branch}`;
+console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl);
 const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
+console.log(footer, privateFooter);
 function sendWebhook(text) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(text);
@@ -13941,7 +13943,6 @@ function buildBuffer(commit) {
         buffer += `(<${repoUrl}/commit/${id}>) ${message}`;
     }
     buffer += "\n";
-    console.log(commit);
     return [buffer, isPrivate];
 }
 function run() {
