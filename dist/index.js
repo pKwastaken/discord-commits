@@ -13901,6 +13901,7 @@ const node_fetch_1 = __importDefault(__nccwpck_require__(4429));
 const utils_1 = __nccwpck_require__(1314);
 const url = core.getInput("webhookUrl").replace("/github", "");
 const data = github_1.context.payload;
+console.log(github_1.context);
 const sender = data.sender.login;
 const repo = data.repository.name;
 const branch = github_1.context.ref.replace("refs/heads/", "");
@@ -13910,7 +13911,6 @@ const branchUrl = `${repoUrl}/tree/${branch}`;
 console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl);
 const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
-console.log(footer, privateFooter);
 function sendWebhook(text) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(text);

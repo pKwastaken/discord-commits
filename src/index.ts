@@ -6,6 +6,8 @@ import { obfuscate } from "./utils"
 const url = core.getInput("webhookUrl").replace("/github", "")
 const data = context.payload
 
+console.log(context)
+
 const sender = data.sender!.login
 const repo = data.repository!.name
 const branch = context.ref.replace("refs/heads/", "")
@@ -17,8 +19,6 @@ console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl)
 
 const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`
-
-console.log(footer, privateFooter)
 
 type Commit = {
 	id: string
