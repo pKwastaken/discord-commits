@@ -46,7 +46,7 @@ async function send(): Promise<void> {
 async function run(): Promise<void> {
 	if (context.eventName !== "push")
 		return
-
+	console.log(data.commits)
 	for (const commit of data.commits) {
 		let [text, _private] = generateText(commit)
 		if (_private) isPrivate = true

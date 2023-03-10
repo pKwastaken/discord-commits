@@ -13911,49 +13911,39 @@ const originalFooter = `[${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
 const privateFooter = `${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
 let isPrivate = false;
 const footer = () => `- [${sender}](<${senderUrl}>) on ${isPrivate ? privateFooter : originalFooter}`;
-let text = new String();
+let buffer = new String();
 function send() {
     return __awaiter(this, void 0, void 0, function* () {
+        const content = buffer + footer();
         const res = yield (0, node_fetch_1.default)(url, {
             method: "POST",
             body: JSON.stringify({
                 username: sender,
                 avatar_url: data.sender.avatar_url,
-                content: text
+                content: content
             }),
             headers: { "Content-Type": "application/json" }
         });
-        if (!res.ok) {
+        if (!res.ok)
             core.setFailed(yield res.text());
-        }
-        text = new String();
+        buffer = new String();
     });
-}
-function buildBuffer(commit) {
-    const id = commit.id.substring(0, 8);
-    let buffer = `[\`${id}\`]`;
-    let message = commit.message;
-    let isPrivate = false;
-    if (message.startsWith("!") || message.startsWith("$")) {
-        isPrivate = true;
-        buffer += `() [${(0, utils_1.obfuscate)(message.substring(1).trim())}]`;
-    }
-    else {
-        buffer += `(<${repoUrl}/commit/${id}>) ${message}`;
-    }
-    buffer += "\n";
-    return buffer;
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         if (github_1.context.eventName !== "push")
             return;
+        console.log(data.commits);
         for (const commit of data.commits) {
-            const buffer = buildBuffer(commit);
-            text += buffer + footer();
-            console.log(text.length);
-            if (text.length >= 2000)
+            let [text, _private] = (0, utils_1.generateText)(commit);
+            if (_private)
+                isPrivate = true;
+            console.log("text: " + text);
+            console.log("buffer: " + buffer);
+            console.log("length: " + buffer.length + footer().length + text.length);
+            if (buffer.length + footer().length + text.length >= 2000)
                 yield send();
+            buffer += text;
             data.commits.shift();
         }
         yield send();
@@ -13970,7 +13960,7 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.obfuscate = void 0;
+exports.generateText = exports.obfuscate = void 0;
 const blocks = ["▂", "▄", "▆", "█"];
 function obfuscate(input) {
     let output = "";
@@ -13987,6 +13977,23 @@ function obfuscate(input) {
     return output;
 }
 exports.obfuscate = obfuscate;
+function generateText(commit) {
+    const id = commit.id.substring(0, 8);
+    const repo = commit.url.split("/commit")[0];
+    let text = `[\`${id}\`]`;
+    let message = commit.message;
+    let isPrivate = false;
+    if (message.startsWith("!") || message.startsWith("$")) {
+        isPrivate = true;
+        text += `() [${obfuscate(message.substring(1).trim())}]`;
+    }
+    else {
+        text += `(<${repo}/commit/${id}>) ${message}`;
+    }
+    text += "\n";
+    return [text, isPrivate];
+}
+exports.generateText = generateText;
 
 
 /***/ }),
