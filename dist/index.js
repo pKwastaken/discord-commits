@@ -13915,6 +13915,7 @@ let buffer = new String();
 function send() {
     return __awaiter(this, void 0, void 0, function* () {
         const content = buffer + footer();
+        console.log("send length:" + content.length);
         const res = yield (0, node_fetch_1.default)(url, {
             method: "POST",
             body: JSON.stringify({
@@ -13924,8 +13925,9 @@ function send() {
             }),
             headers: { "Content-Type": "application/json" }
         });
-        if (!res.ok)
+        if (!res.ok) {
             core.setFailed(yield res.text());
+        }
         buffer = new String();
     });
 }
@@ -13941,7 +13943,7 @@ function run() {
             if (_private)
                 isPrivate = true;
             console.log("text: " + text.length);
-            console.log("loop buffer: " + buffer.length);
+            console.log("in loop buffer: " + buffer.length);
             console.log("length: " + Number(buffer.length + footer().length + text.length));
             if (buffer.length + footer().length + text.length >= 2000) {
                 yield send();
@@ -13951,8 +13953,9 @@ function run() {
             data.commits.shift();
         }
         console.log("out loop buffer: " + buffer.length);
-        if (!hasSent)
+        if (!hasSent) {
             yield send();
+        }
     });
 }
 run();
