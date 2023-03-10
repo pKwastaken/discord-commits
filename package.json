@@ -4,15 +4,17 @@
   "main": "src/index.ts",
   "type": "commonjs",
   "scripts": {
-    "package": "ncc build --source-map --license licenses.txt"
+    "build": "tsc",
+    "package": "ncc build --source-map --license licenses.txt",
+    "all": "yarn build && yarn package"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
-    "@types/node": "^18.11.18",
+    "@types/node": "^18.15.0",
     "@types/node-fetch": "^2.6.2",
-    "@vercel/ncc": "^0.36.0",
-    "node-fetch": "2",
-    "typescript": "^4.9.4"
+    "@vercel/ncc": "^0.36.1",
+    "node-fetch": "^3.3.0",
+    "typescript": "^4.9.5"
   }
 }
