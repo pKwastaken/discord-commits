@@ -13940,8 +13940,8 @@ function run() {
             let [text, _private] = (0, utils_1.generateText)(commit);
             if (_private)
                 isPrivate = true;
-            console.log("text: " + text);
-            console.log("buffer: " + buffer);
+            console.log("text: " + text.length);
+            console.log("loop buffer: " + buffer.length);
             console.log("length: " + Number(buffer.length + footer().length + text.length));
             if (buffer.length + footer().length + text.length >= 2000) {
                 yield send();
@@ -13950,6 +13950,7 @@ function run() {
             buffer += text;
             data.commits.shift();
         }
+        console.log("out loop buffer: " + buffer.length);
         if (!hasSent)
             yield send();
     });

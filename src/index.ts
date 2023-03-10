@@ -53,8 +53,8 @@ async function run(): Promise<void> {
 		hasSent = false
 		let [text, _private] = generateText(commit)
 		if (_private) isPrivate = true
-		console.log("text: " + text)
-		console.log("buffer: " + buffer)
+		console.log("text: " + text.length)
+		console.log("loop buffer: " + buffer.length)
 		console.log("length: " + Number(buffer.length + footer().length + text.length))
 
 		if (buffer.length + footer().length + text.length >= 2000) {
@@ -65,6 +65,8 @@ async function run(): Promise<void> {
 		buffer += text
 		data.commits.shift()
 	}
+
+	console.log("out loop buffer: " + buffer.length)
 
 	if (!hasSent)
 		await send()
