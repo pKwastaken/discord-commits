@@ -8,6 +8,7 @@ const data = context.payload
 
 console.log(context)
 
+
 const sender = data.sender!.login
 const repo = data.repository!.name
 const branch = context.ref.replace("refs/heads/", "")
