@@ -66,7 +66,6 @@ async function run(): Promise<void> {
 		}
 
 		buffer += text
-		data.commits.shift()
 	}
 
 	console.log("out loop buffer: " + buffer.length)

@@ -13950,7 +13950,6 @@ function run() {
                 hasSent = true;
             }
             buffer += text;
-            data.commits.shift();
         }
         console.log("out loop buffer: " + buffer.length);
         if (!hasSent) {
