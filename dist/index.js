@@ -13947,10 +13947,12 @@ function buildBuffer(commit) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("running???");
         let workingFooter = footer;
         let text = "";
         for (const commit of data.commits) {
             const [buffer, isPrivate] = buildBuffer(commit);
+            console.log(buffer);
             if (isPrivate)
                 workingFooter = privateFooter;
             if (buffer.length + text.length + workingFooter.length > 2000) {
