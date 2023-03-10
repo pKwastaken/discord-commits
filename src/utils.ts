@@ -29,7 +29,7 @@ export function generateText(commit: Commit): [string, boolean] {
 
 	if (message.startsWith("!") || message.startsWith("$")) {
 		isPrivate = true
-		text += `() [${obfuscate(message.substring(1).trim())}]`
+		text += `() ${obfuscate(message.substring(1).trim())}`
 	} else {
 		text += `(<${repo}/commit/${id}>) ${message}`
 	}
