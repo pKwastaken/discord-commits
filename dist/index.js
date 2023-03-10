@@ -13901,31 +13901,32 @@ const node_fetch_1 = __importDefault(__nccwpck_require__(4429));
 const utils_1 = __nccwpck_require__(1314);
 const url = core.getInput("webhookUrl").replace("/github", "");
 const data = github_1.context.payload;
-// https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-// console.log(context)
 const sender = data.sender.login;
 const repo = data.repository.name;
 const branch = github_1.context.ref.replace("refs/heads/", "");
 const senderUrl = `${data.sender.html_url}`;
 const repoUrl = `${data.repository.html_url}`;
 const branchUrl = `${repoUrl}/tree/${branch}`;
-console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl);
-const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
-const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
-function sendWebhook(text) {
+const originalFooter = `[${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
+const privateFooter = `${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
+let isPrivate = false;
+const footer = () => `- [${sender}](<${senderUrl}>) on ${isPrivate ? privateFooter : originalFooter}`;
+let text = new String();
+function send() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("INSIDE WEBHOOK");
-        const options = {
+        const res = yield (0, node_fetch_1.default)(url, {
             method: "POST",
             body: JSON.stringify({
-                username: data.sender.login,
+                username: sender,
                 avatar_url: data.sender.avatar_url,
                 content: text
             }),
             headers: { "Content-Type": "application/json" }
-        };
-        console.log(options);
-        return (0, node_fetch_1.default)(url, options);
+        });
+        if (!res.ok) {
+            core.setFailed(yield res.text());
+        }
+        text = new String();
     });
 }
 function buildBuffer(commit) {
@@ -13935,41 +13936,24 @@ function buildBuffer(commit) {
     let isPrivate = false;
     if (message.startsWith("!") || message.startsWith("$")) {
         isPrivate = true;
-        buffer += `() `;
-        message = message.substring(1).trim();
-        buffer += (0, utils_1.obfuscate)(message);
+        buffer += `() [${(0, utils_1.obfuscate)(message.substring(1).trim())}]`;
     }
     else {
         buffer += `(<${repoUrl}/commit/${id}>) ${message}`;
     }
     buffer += "\n";
-    return [buffer, isPrivate];
+    return buffer;
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        let workingFooter = footer;
-        let text = new String();
-        function send() {
-            return __awaiter(this, void 0, void 0, function* () {
-                text += workingFooter;
-                const response = yield sendWebhook(text);
-                // console.log(response)
-                if (!response.ok) {
-                    core.setFailed(yield response.text());
-                }
-                workingFooter = footer;
-                text = "";
-            });
-        }
+        if (github_1.context.eventName !== "push")
+            return;
         for (const commit of data.commits) {
-            const [buffer, isPrivate] = buildBuffer(commit);
-            console.log(buffer);
-            if (isPrivate)
-                workingFooter = privateFooter;
-            console.log(text.length, buffer.length, workingFooter.length);
-            if (text.length + buffer.length + workingFooter.length > 2000)
+            const buffer = buildBuffer(commit);
+            text += buffer + footer();
+            console.log(text.length);
+            if (text.length >= 2000)
                 yield send();
-            text += buffer;
             data.commits.shift();
         }
         yield send();

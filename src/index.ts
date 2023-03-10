@@ -7,10 +7,6 @@ import { Commit, PushEvent } from "@octokit/webhooks-definitions/schema"
 const url = core.getInput("webhookUrl").replace("/github", "")
 const data = context.payload as PushEvent
 
-// https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-
-// console.log(context)
-
 const sender = data.sender!.login
 const repo = data.repository!.name
 const branch = context.ref.replace("refs/heads/", "")
@@ -18,28 +14,36 @@ const senderUrl = `${data.sender!.html_url}`
 const repoUrl = `${data.repository!.html_url}`
 const branchUrl = `${repoUrl}/tree/${branch}`
 
-console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl)
+const originalFooter = `[${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
+const privateFooter = `${obfuscate(repo)}/${obfuscate(branch)}`
 
-const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
-const privateFooter = `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`
+let isPrivate = false
+const footer = () =>
+	`- [${sender}](<${senderUrl}>) on ${
+		isPrivate ? privateFooter : originalFooter
+	}`
 
-async function sendWebhook(text: String): Promise<Response> {
-	console.log("INSIDE WEBHOOK")
-	const options = {
+let text = new String()
+
+async function send(): Promise<void> {
+	const res = await fetch(url, {
 		method: "POST",
 		body: JSON.stringify({
-			username: data.sender!.login,
-			avatar_url: data.sender!.avatar_url,
+			username: sender,
+			avatar_url: data.sender.avatar_url,
 			content: text
 		}),
 		headers: { "Content-Type": "application/json" }
-	}
-	console.log(options)
+	})
 
-	return fetch(url, options)
+	if (!res.ok) {
+		core.setFailed(await res.text())
+	}
+
+	text = new String()
 }
 
-function buildBuffer(commit: Commit): [string, boolean] {
+function buildBuffer(commit: Commit): string {
 	const id = commit.id.substring(0, 8)
 	let buffer = `[\`${id}\`]`
 	let message = commit.message
@@ -47,44 +51,25 @@ function buildBuffer(commit: Commit): [string, boolean] {
 
 	if (message.startsWith("!") || message.startsWith("$")) {
 		isPrivate = true
-		buffer += `() `
-		message = message.substring(1).trim()
-		buffer += obfuscate(message)
+		buffer += `() [${obfuscate(message.substring(1).trim())}]`
 	} else {
 		buffer += `(<${repoUrl}/commit/${id}>) ${message}`
 	}
 
 	buffer += "\n"
-	return [buffer, isPrivate]
+	return buffer
 }
 
-async function run() {
-	let workingFooter = footer
-	let text = new String()
-
-	async function send() {
-		text += workingFooter
-		const response = await sendWebhook(text)
-		// console.log(response)
-
-		if (!response.ok) {
-			core.setFailed(await response.text())
-		}
-
-		workingFooter = footer
-		text = ""
-	}
+async function run(): Promise<void> {
+	if (context.eventName !== "push") return
 
 	for (const commit of data.commits) {
-		const [buffer, isPrivate] = buildBuffer(commit)
-		console.log(buffer)
-		
-		if (isPrivate) workingFooter = privateFooter
-		console.log(text.length, buffer.length, workingFooter.length)
+		const buffer = buildBuffer(commit)
+		text += buffer + footer()
+		console.log(text.length)
 
-		if (text.length + buffer.length + workingFooter.length > 2000) await send()
+		if (text.length >= 2000) await send()
 
-		text += buffer
 		data.commits.shift()
 	}
 
