@@ -13938,8 +13938,10 @@ function run() {
             if (_private)
                 isPrivate = true;
             const sendLength = text.length + buffer.length + footer().length;
-            if (sendLength >= 2000)
+            if (sendLength >= 2000) {
                 yield send();
+                isPrivate = false;
+            }
             buffer += text;
         }
         if (buffer.length > 0)

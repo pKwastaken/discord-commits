@@ -52,7 +52,10 @@ async function run(): Promise<void> {
 
 		const sendLength = text.length + buffer.length + footer().length
 
-		if (sendLength >= 2000) await send()
+		if (sendLength >= 2000) {
+			await send()
+			isPrivate = false
+		}
 
 		buffer += text
 	}
