@@ -32,7 +32,8 @@ async function send(): Promise<void> {
 		body: JSON.stringify({
 			username: sender,
 			avatar_url: data.sender.avatar_url,
-			content: content
+			content: content,
+			allowed_mentions: { parse: [] }
 		}),
 		headers: { "Content-Type": "application/json" }
 	})
