@@ -13911,6 +13911,7 @@ const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${bran
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
 function sendWebhook(text) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log(text);
         const options = {
             method: "POST",
             body: JSON.stringify({
@@ -13940,6 +13941,7 @@ function buildBuffer(commit) {
         buffer += `(<${repoUrl}/commit/${id}>) ${message}`;
     }
     buffer += "\n";
+    console.log(commit);
     return [buffer, isPrivate];
 }
 function run() {

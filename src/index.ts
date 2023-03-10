@@ -24,6 +24,7 @@ type Commit = {
 }
 
 async function sendWebhook(text: string): Promise<Response> {
+	console.log(text)
 	const options = {
 		method: "POST",
 		body: JSON.stringify({
@@ -55,7 +56,7 @@ function buildBuffer(commit: Commit): [string, boolean] {
 	}
 
 	buffer += "\n"
-
+console.log(commit)
 	return [buffer, isPrivate]
 }
 
