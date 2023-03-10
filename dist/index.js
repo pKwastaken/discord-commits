@@ -13902,7 +13902,7 @@ const utils_1 = __nccwpck_require__(1314);
 const url = core.getInput("webhookUrl").replace("/github", "");
 const data = github_1.context.payload;
 // https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-console.log(github_1.context);
+// console.log(context)
 const sender = data.sender.login;
 const repo = data.repository.name;
 const branch = github_1.context.ref.replace("refs/heads/", "");

@@ -9,7 +9,7 @@ const data = context.payload as PushEvent
 
 // https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
 
-console.log(context)
+// console.log(context)
 
 const sender = data.sender!.login
 const repo = data.repository!.name
