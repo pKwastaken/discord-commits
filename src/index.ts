@@ -7,11 +7,11 @@ import { generateText, obfuscate } from "./utils"
 const url = core.getInput("webhookUrl").replace("/github", "")
 const data = context.payload as PushEvent
 
-const sender = data.sender!.login
-const repo = data.repository!.name
+const sender = data.sender.login
+const repo = data.repository.name
 const branch = context.ref.replace("refs/heads/", "")
-const senderUrl = `${data.sender!.html_url}`
-const repoUrl = `${data.repository!.html_url}`
+const senderUrl = `${data.sender.html_url}`
+const repoUrl = `${data.repository.html_url}`
 const branchUrl = `${repoUrl}/tree/${branch}`
 
 const originalFooter = `[${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
