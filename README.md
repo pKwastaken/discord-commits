@@ -28,3 +28,6 @@ jobs:
 ![image](https://user-images.githubusercontent.com/36643731/224229138-4efc9094-be0e-4d4a-92b1-43959ed8d9b3.png)
 
 ![image](https://user-images.githubusercontent.com/36643731/158245611-90bf6651-eb23-4f7a-ab7e-3cc55b6047af.png)
+
+# Remarks
+Currently only push events are supported and the focus of this tool. Pull requests and issues for more ideas/features are more than welcome!
