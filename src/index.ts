@@ -23,7 +23,7 @@ console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl)
 const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`
 
-async function sendWebhook(text: string): Promise<Response> {
+async function sendWebhook(text: String): Promise<Response> {
 	console.log("INSIDE WEBHOOK")
 	const options = {
 		method: "POST",
@@ -59,32 +59,36 @@ function buildBuffer(commit: Commit): [string, boolean] {
 }
 
 async function run() {
-	console.log("running???")
 	let workingFooter = footer
-	let text = ""
+	let text = new String()
+
+	async function send() {
+		text += workingFooter
+		const response = await sendWebhook(text)
+		// console.log(response)
+
+		if (!response.ok) {
+			core.setFailed(await response.text())
+		}
+
+		workingFooter = footer
+		text = ""
+	}
 
 	for (const commit of data.commits) {
 		const [buffer, isPrivate] = buildBuffer(commit)
 		console.log(buffer)
 		
 		if (isPrivate) workingFooter = privateFooter
-		if (buffer.length + text.length + workingFooter.length > 2000) {
-			text += workingFooter
-			console.log("SENDING WEBHOOK")
-			const response = await sendWebhook(text)
-			console.log(response)
+		console.log(text.length, buffer.length, workingFooter.length)
 
-			if (!response.ok) {
-				core.setFailed(await response.text())
-			}
-
-			workingFooter = footer
-			text = ""
-		}
+		if (text.length + buffer.length + workingFooter.length > 2000) await send()
 
 		text += buffer
 		data.commits.shift()
 	}
+
+	await send()
 }
 
 run()

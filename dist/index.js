@@ -13947,28 +13947,32 @@ function buildBuffer(commit) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("running???");
         let workingFooter = footer;
-        let text = "";
-        for (const commit of data.commits) {
-            const [buffer, isPrivate] = buildBuffer(commit);
-            console.log(buffer);
-            if (isPrivate)
-                workingFooter = privateFooter;
-            if (buffer.length + text.length + workingFooter.length > 2000) {
+        let text = new String();
+        function send() {
+            return __awaiter(this, void 0, void 0, function* () {
                 text += workingFooter;
-                console.log("SENDING WEBHOOK");
                 const response = yield sendWebhook(text);
-                console.log(response);
+                // console.log(response)
                 if (!response.ok) {
                     core.setFailed(yield response.text());
                 }
                 workingFooter = footer;
                 text = "";
-            }
+            });
+        }
+        for (const commit of data.commits) {
+            const [buffer, isPrivate] = buildBuffer(commit);
+            console.log(buffer);
+            if (isPrivate)
+                workingFooter = privateFooter;
+            console.log(text.length, buffer.length, workingFooter.length);
+            if (text.length + buffer.length + workingFooter.length > 2000)
+                yield send();
             text += buffer;
             data.commits.shift();
         }
+        yield send();
     });
 }
 run();
