@@ -13901,6 +13901,7 @@ const node_fetch_1 = __importDefault(__nccwpck_require__(4429));
 const utils_1 = __nccwpck_require__(1314);
 const url = core.getInput("webhookUrl").replace("/github", "");
 const data = github_1.context.payload;
+// https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
 console.log(github_1.context);
 const sender = data.sender.login;
 const repo = data.repository.name;
@@ -13913,7 +13914,7 @@ const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${bran
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
 function sendWebhook(text) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(text);
+        console.log("INSIDE WEBHOOK");
         const options = {
             method: "POST",
             body: JSON.stringify({
@@ -13924,8 +13925,7 @@ function sendWebhook(text) {
             headers: { "Content-Type": "application/json" }
         };
         console.log(options);
-        const response = yield (0, node_fetch_1.default)(url, options);
-        return response;
+        return (0, node_fetch_1.default)(url, options);
     });
 }
 function buildBuffer(commit) {
@@ -13957,7 +13957,9 @@ function run() {
                 workingFooter = privateFooter;
             if (buffer.length + text.length + workingFooter.length > 2000) {
                 text += workingFooter;
+                console.log("SENDING WEBHOOK");
                 const response = yield sendWebhook(text);
+                console.log(response);
                 if (!response.ok) {
                     core.setFailed(yield response.text());
                 }

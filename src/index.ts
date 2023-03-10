@@ -7,6 +7,8 @@ import { Commit, PushEvent } from "@octokit/webhooks-definitions/schema"
 const url = core.getInput("webhookUrl").replace("/github", "")
 const data = context.payload as PushEvent
 
+// https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+
 console.log(context)
 
 const sender = data.sender!.login
@@ -22,7 +24,7 @@ const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${bran
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`
 
 async function sendWebhook(text: string): Promise<Response> {
-	console.log(text)
+	console.log("INSIDE WEBHOOK")
 	const options = {
 		method: "POST",
 		body: JSON.stringify({
@@ -33,9 +35,8 @@ async function sendWebhook(text: string): Promise<Response> {
 		headers: { "Content-Type": "application/json" }
 	}
 	console.log(options)
-	const response = await fetch(url, options)
 
-	return response
+	return fetch(url, options)
 }
 
 function buildBuffer(commit: Commit): [string, boolean] {
@@ -69,7 +70,9 @@ async function run() {
 		if (isPrivate) workingFooter = privateFooter
 		if (buffer.length + text.length + workingFooter.length > 2000) {
 			text += workingFooter
+			console.log("SENDING WEBHOOK")
 			const response = await sendWebhook(text)
+			console.log(response)
 
 			if (!response.ok) {
 				core.setFailed(await response.text())
