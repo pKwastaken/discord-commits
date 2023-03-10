@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "commonjs",
+    "target": "ES6",
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
