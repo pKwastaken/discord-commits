@@ -2,9 +2,10 @@ import { context } from "@actions/github"
 import * as core from "@actions/core"
 import fetch, { Response } from "node-fetch"
 import { obfuscate } from "./utils"
+import { Commit, PushEvent } from "@octokit/webhooks-definitions/schema"
 
 const url = core.getInput("webhookUrl").replace("/github", "")
-const data = context.payload
+const data = context.payload as PushEvent
 
 console.log(context)
 
@@ -19,13 +20,6 @@ console.log(url, sender, repo, branch, senderUrl, repoUrl, branchUrl)
 
 const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${obfuscate(repo)}/${obfuscate(branch)}`
-
-type Commit = {
-	id: string
-	message: string
-	url: string
-	[key: string]: any
-}
 
 async function sendWebhook(text: string): Promise<Response> {
 	console.log(text)
@@ -64,11 +58,13 @@ function buildBuffer(commit: Commit): [string, boolean] {
 }
 
 async function run() {
+	console.log("running???")
 	let workingFooter = footer
 	let text = ""
 
 	for (const commit of data.commits) {
 		const [buffer, isPrivate] = buildBuffer(commit)
+		console.log(buffer)
 		
 		if (isPrivate) workingFooter = privateFooter
 		if (buffer.length + text.length + workingFooter.length > 2000) {
