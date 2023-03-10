@@ -13911,7 +13911,7 @@ const footer = `- [${sender}](<${senderUrl}>) on [${repo}](<${repoUrl}>)/[${bran
 const privateFooter = `- [${sender}](<${senderUrl}>) on ${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
 function sendWebhook(text) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield (0, node_fetch_1.default)(url, {
+        const options = {
             method: "POST",
             body: JSON.stringify({
                 username: data.sender.login,
@@ -13919,7 +13919,9 @@ function sendWebhook(text) {
                 content: text
             }),
             headers: { "Content-Type": "application/json" }
-        });
+        };
+        console.log(options);
+        const response = yield (0, node_fetch_1.default)(url, options);
         return response;
     });
 }

@@ -24,7 +24,7 @@ type Commit = {
 }
 
 async function sendWebhook(text: string): Promise<Response> {
-	const response = await fetch(url, {
+	const options = {
 		method: "POST",
 		body: JSON.stringify({
 			username: data.sender!.login,
@@ -32,7 +32,9 @@ async function sendWebhook(text: string): Promise<Response> {
 			content: text
 		}),
 		headers: { "Content-Type": "application/json" }
-	})
+	}
+	console.log(options)
+	const response = await fetch(url, options)
 
 	return response
 }
