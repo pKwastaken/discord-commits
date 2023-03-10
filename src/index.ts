@@ -46,22 +46,28 @@ async function send(): Promise<void> {
 async function run(): Promise<void> {
 	if (context.eventName !== "push")
 		return
+
+	let hasSent = false
 	console.log(data.commits)
 	for (const commit of data.commits) {
+		hasSent = false
 		let [text, _private] = generateText(commit)
 		if (_private) isPrivate = true
 		console.log("text: " + text)
 		console.log("buffer: " + buffer)
-		console.log("length: " + buffer.length + footer().length + text.length)
+		console.log("length: " + Number(buffer.length + footer().length + text.length))
 
-		if (buffer.length + footer().length + text.length >= 2000)
+		if (buffer.length + footer().length + text.length >= 2000) {
 			await send()
+			hasSent = true
+		}
 
 		buffer += text
 		data.commits.shift()
 	}
 
-	await send()
+	if (!hasSent)
+		await send()
 }
 
 run()

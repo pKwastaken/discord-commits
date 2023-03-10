@@ -13933,20 +13933,25 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         if (github_1.context.eventName !== "push")
             return;
+        let hasSent = false;
         console.log(data.commits);
         for (const commit of data.commits) {
+            hasSent = false;
             let [text, _private] = (0, utils_1.generateText)(commit);
             if (_private)
                 isPrivate = true;
             console.log("text: " + text);
             console.log("buffer: " + buffer);
-            console.log("length: " + buffer.length + footer().length + text.length);
-            if (buffer.length + footer().length + text.length >= 2000)
+            console.log("length: " + Number(buffer.length + footer().length + text.length));
+            if (buffer.length + footer().length + text.length >= 2000) {
                 yield send();
+                hasSent = true;
+            }
             buffer += text;
             data.commits.shift();
         }
-        yield send();
+        if (!hasSent)
+            yield send();
     });
 }
 run();
