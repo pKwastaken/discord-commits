@@ -1,8 +1,8 @@
 import { context } from "@actions/github"
 import * as core from "@actions/core"
-import fetch, { Response } from "node-fetch"
-import { obfuscate } from "./utils"
-import { Commit, PushEvent } from "@octokit/webhooks-definitions/schema"
+import fetch from "node-fetch"
+import { PushEvent } from "@octokit/webhooks-definitions/schema"
+import { generateText, obfuscate } from "./utils"
 
 const url = core.getInput("webhookUrl").replace("/github", "")
 const data = context.payload as PushEvent
@@ -23,53 +23,41 @@ const footer = () =>
 		isPrivate ? privateFooter : originalFooter
 	}`
 
-let text = new String()
+let buffer = new String()
 
 async function send(): Promise<void> {
+	const content = buffer + footer()
 	const res = await fetch(url, {
 		method: "POST",
 		body: JSON.stringify({
 			username: sender,
 			avatar_url: data.sender.avatar_url,
-			content: text
+			content: content
 		}),
 		headers: { "Content-Type": "application/json" }
 	})
 
-	if (!res.ok) {
+	if (!res.ok)
 		core.setFailed(await res.text())
-	}
 
-	text = new String()
-}
-
-function buildBuffer(commit: Commit): string {
-	const id = commit.id.substring(0, 8)
-	let buffer = `[\`${id}\`]`
-	let message = commit.message
-	let isPrivate = false
-
-	if (message.startsWith("!") || message.startsWith("$")) {
-		isPrivate = true
-		buffer += `() [${obfuscate(message.substring(1).trim())}]`
-	} else {
-		buffer += `(<${repoUrl}/commit/${id}>) ${message}`
-	}
-
-	buffer += "\n"
-	return buffer
+	buffer = new String()
 }
 
 async function run(): Promise<void> {
-	if (context.eventName !== "push") return
+	if (context.eventName !== "push")
+		return
 
 	for (const commit of data.commits) {
-		const buffer = buildBuffer(commit)
-		text += buffer + footer()
-		console.log(text.length)
+		let [text, _private] = generateText(commit)
+		if (_private) isPrivate = true
+		console.log("text: " + text)
+		console.log("buffer: " + buffer)
+		console.log("length: " + buffer.length + footer().length + text.length)
 
-		if (text.length >= 2000) await send()
+		if (buffer.length + footer().length + text.length >= 2000)
+			await send()
 
+		buffer += text
 		data.commits.shift()
 	}
 
