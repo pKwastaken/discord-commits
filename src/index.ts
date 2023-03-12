@@ -10,8 +10,8 @@ const data = context.payload as PushEvent
 const sender = data.sender.login
 const repo = data.repository.name
 const branch = context.ref.replace("refs/heads/", "")
-const senderUrl = `${data.sender.html_url}`
-const repoUrl = `${data.repository.html_url}`
+const senderUrl = data.sender.html_url
+const repoUrl = data.repository.html_url
 const branchUrl = `${repoUrl}/tree/${branch}`
 
 const originalFooter = `[${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`
@@ -47,7 +47,7 @@ async function run(): Promise<void> {
 	if (context.eventName !== "push") return
 
 	for (const commit of data.commits) {
-		let [text, _private] = generateText(commit)
+		const [text, _private] = generateText(commit)
 
 		if (_private) isPrivate = true
 
