@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Discord webhook
-      uses: itz-coffee/discord-commits@v2.0.0
+      uses: itz-coffee/discord-commits@v2.0.1
       with:
         webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 ```
