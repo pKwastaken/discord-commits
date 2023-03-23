@@ -23,7 +23,7 @@ const footer = () =>
 		isPrivate ? privateFooter : originalFooter
 	}`
 
-let buffer = new String()
+let buffer = String()
 
 async function send(): Promise<void> {
 	const content = buffer + footer()
@@ -40,7 +40,7 @@ async function send(): Promise<void> {
 
 	if (!res.ok) core.setFailed(await res.text())
 
-	buffer = new String()
+	buffer = String()
 }
 
 async function run(): Promise<void> {

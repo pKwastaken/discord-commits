@@ -13904,14 +13904,14 @@ const data = github_1.context.payload;
 const sender = data.sender.login;
 const repo = data.repository.name;
 const branch = github_1.context.ref.replace("refs/heads/", "");
-const senderUrl = `${data.sender.html_url}`;
-const repoUrl = `${data.repository.html_url}`;
+const senderUrl = data.sender.html_url;
+const repoUrl = data.repository.html_url;
 const branchUrl = `${repoUrl}/tree/${branch}`;
 const originalFooter = `[${repo}](<${repoUrl}>)/[${branch}](<${branchUrl}>)`;
 const privateFooter = `${(0, utils_1.obfuscate)(repo)}/${(0, utils_1.obfuscate)(branch)}`;
 let isPrivate = false;
 const footer = () => `- [${sender}](<${senderUrl}>) on ${isPrivate ? privateFooter : originalFooter}`;
-let buffer = new String();
+let buffer = String();
 function send() {
     return __awaiter(this, void 0, void 0, function* () {
         const content = buffer + footer();
@@ -13920,13 +13920,14 @@ function send() {
             body: JSON.stringify({
                 username: sender,
                 avatar_url: data.sender.avatar_url,
-                content: content
+                content: content,
+                allowed_mentions: { parse: [] }
             }),
             headers: { "Content-Type": "application/json" }
         });
         if (!res.ok)
             core.setFailed(yield res.text());
-        buffer = new String();
+        buffer = String();
     });
 }
 function run() {
@@ -13934,7 +13935,7 @@ function run() {
         if (github_1.context.eventName !== "push")
             return;
         for (const commit of data.commits) {
-            let [text, _private] = (0, utils_1.generateText)(commit);
+            const [text, _private] = (0, utils_1.generateText)(commit);
             if (_private)
                 isPrivate = true;
             const sendLength = text.length + buffer.length + footer().length;
@@ -13962,7 +13963,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateText = exports.obfuscate = void 0;
 const blocks = ["▂", "▄", "▆", "█"];
 function obfuscate(input) {
-    let output = "";
+    let output = String();
     for (let i = 0; i < input.length; i++) {
         const char = input.charAt(i);
         if (char.match(/\S+/)) {

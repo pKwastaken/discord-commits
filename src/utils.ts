@@ -3,7 +3,7 @@ import { Commit } from "@octokit/webhooks-definitions/schema"
 const blocks = ["▂", "▄", "▆", "█"]
 
 export function obfuscate(input: string): string {
-	let output = ""
+	let output = String()
 
 	for (let i = 0; i < input.length; i++) {
 		const char = input.charAt(i)
