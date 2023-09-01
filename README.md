@@ -22,7 +22,7 @@ jobs:
       with:
         webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 ```
-- Add your discord webhook as a secret named `webhookUrl`
+- Add your discord webhook as a secret named `discord_webhook`
 - Any commits starting with a `!` or `$` will be private
 
 ![image](https://user-images.githubusercontent.com/36643731/224229138-4efc9094-be0e-4d4a-92b1-43959ed8d9b3.png)
